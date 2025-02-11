@@ -43,16 +43,28 @@ public class EmployeeService {
     }
 
     public Employee updateEmployee(Long id, EmployeeDto emp) {
-        Employee existingEmployee = getEmployeeById(id);
+        Employee existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
         existingEmployee.setName(emp.getName());
         existingEmployee.setEmail(emp.getEmail());
         existingEmployee.setRole(emp.getRole());
         existingEmployee.setDepartment(emp.getDepartment());
+
         return employeeRepository.save(existingEmployee);
     }
 
     public void deleteEmployee(Long id) {
         Employee employee = getEmployeeById(id);
         employeeRepository.delete(employee);
+    }
+
+    public Employee updateEmployeeDetails(Long id, EmployeeDto emp) {
+        Employee existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee unavailable"));
+        if (emp.getName() != null) existingEmployee.setName(emp.getName());
+        if (emp.getEmail() != null) existingEmployee.setEmail(emp.getEmail());
+        if (emp.getRole() != null) existingEmployee.setRole(emp.getRole());
+        if (emp.getDepartment() != null) existingEmployee.setDepartment(emp.getDepartment());
+        return employeeRepository.save(existingEmployee);
     }
 }

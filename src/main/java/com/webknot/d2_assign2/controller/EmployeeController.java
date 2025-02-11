@@ -37,12 +37,18 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDto emp) {
-        return ResponseEntity.ok(employeeService.updateEmployee(id, emp));
+        Employee updatedEmployee = employeeService.updateEmployee(id, emp);
+        return ResponseEntity.ok(updatedEmployee);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.ok("Employee deleted");
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployeeDetails(@PathVariable Long id, @RequestBody EmployeeDto emp) {
+        return ResponseEntity.ok(employeeService.updateEmployeeDetails(id, emp));
     }
 }
