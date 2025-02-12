@@ -8,7 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Builder
 public class Skill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

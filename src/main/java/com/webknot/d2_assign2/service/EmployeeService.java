@@ -1,8 +1,10 @@
 package com.webknot.d2_assign2.service;
 import com.webknot.d2_assign2.dto.EmployeeDto;
 import com.webknot.d2_assign2.entity.Employee;
+import com.webknot.d2_assign2.entity.Project;
 import com.webknot.d2_assign2.entity.Skill;
 import com.webknot.d2_assign2.repository.EmployeeRepository;
+import com.webknot.d2_assign2.repository.ProjectRepository;
 import com.webknot.d2_assign2.repository.SkillRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Service
@@ -20,11 +23,13 @@ import java.util.*;
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final SkillRepository skillRepository;
+    private final ProjectRepository projectRepository;
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository, SkillRepository skillRepository){
+    public EmployeeService(EmployeeRepository employeeRepository, SkillRepository skillRepository, ProjectRepository projectRepository){
         this.employeeRepository=employeeRepository;
         this.skillRepository = skillRepository;
+        this.projectRepository = projectRepository;
     }
 
     public Employee addEmployee(EmployeeDto emp) {
@@ -76,11 +81,10 @@ public class EmployeeService {
     //Skill Set Management – Add or remove skills for employees.
     public Employee addSkills(Long employeeId, Set<Long> skillIds) {
         Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new RuntimeException("Not found"));
 
-        Set<Skill> skills = new HashSet<>(skillRepository.findAllById(skillIds));
+        List<Skill> skills = skillRepository.findAllById(skillIds);
         employee.getSkills().addAll(skills);
-
         return employeeRepository.save(employee);
     }
 
@@ -90,6 +94,15 @@ public class EmployeeService {
 
         employee.getSkills().removeIf(skill -> skillIds.contains(skill.getId()));
 
+        return employeeRepository.save(employee);
+    }
+
+    //Project Assignment – Assign employees to projects and track involvement.
+    public Employee assignProjects(Long employeeId, Set<Long> projectIds) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Not found"));
+        Set<Project> projects = new HashSet<>(projectRepository.findAllById(projectIds));
+        employee.setProjects(projects);
         return employeeRepository.save(employee);
     }
 }

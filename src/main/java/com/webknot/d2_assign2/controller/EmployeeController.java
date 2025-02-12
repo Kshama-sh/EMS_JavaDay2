@@ -54,14 +54,23 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.updateEmployeeDetails(id, emp));
     }
 
+    //Skill Set Management – Add or remove skills for employees.
     @PatchMapping("/{id}/add-skills")
     public ResponseEntity<Employee> addSkills(@PathVariable Long id, @RequestBody Set<Long> skillIds) {
         return ResponseEntity.ok(employeeService.addSkills(id, skillIds));
     }
 
-    //Skill Set Management – Add or remove skills for employees.
     @PatchMapping("/{id}/remove-skills")
     public ResponseEntity<Employee> removeSkills(@PathVariable Long id, @RequestBody Set<Long> skillIds) {
         return ResponseEntity.ok(employeeService.removeSkills(id, skillIds));
+    }
+
+    //Project Assignment – Assign employees to projects and track involvement.
+    @PostMapping("/{employeeId}/assign-projects")
+    public ResponseEntity<Employee> assignProjectsToEmployee(
+            @PathVariable Long employeeId,
+            @RequestBody Set<Long> projectIds) {
+        Employee updatedEmployee = employeeService.assignProjects(employeeId, projectIds);
+        return ResponseEntity.ok(updatedEmployee);
     }
 }

@@ -10,7 +10,7 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Builder
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
