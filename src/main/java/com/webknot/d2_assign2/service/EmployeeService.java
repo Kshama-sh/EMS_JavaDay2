@@ -1,7 +1,9 @@
 package com.webknot.d2_assign2.service;
 import com.webknot.d2_assign2.dto.EmployeeDto;
 import com.webknot.d2_assign2.entity.Employee;
+import com.webknot.d2_assign2.entity.Skill;
 import com.webknot.d2_assign2.repository.EmployeeRepository;
+import com.webknot.d2_assign2.repository.SkillRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Service
@@ -17,10 +19,12 @@ import java.util.List;
 @Slf4j
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final SkillRepository skillRepository;
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository){
+    public EmployeeService(EmployeeRepository employeeRepository, SkillRepository skillRepository){
         this.employeeRepository=employeeRepository;
+        this.skillRepository = skillRepository;
     }
 
     public Employee addEmployee(EmployeeDto emp) {
@@ -58,6 +62,7 @@ public class EmployeeService {
         employeeRepository.delete(employee);
     }
 
+    //Edit Employee Information – Modify specific details like name, email, role, or department.
     public Employee updateEmployeeDetails(Long id, EmployeeDto emp) {
         Employee existingEmployee = employeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee unavailable"));
@@ -66,5 +71,25 @@ public class EmployeeService {
         if (emp.getRole() != null) existingEmployee.setRole(emp.getRole());
         if (emp.getDepartment() != null) existingEmployee.setDepartment(emp.getDepartment());
         return employeeRepository.save(existingEmployee);
+    }
+
+    //Skill Set Management – Add or remove skills for employees.
+    public Employee addSkills(Long employeeId, Set<Long> skillIds) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        Set<Skill> skills = new HashSet<>(skillRepository.findAllById(skillIds));
+        employee.getSkills().addAll(skills);
+
+        return employeeRepository.save(employee);
+    }
+
+    public Employee removeSkills(Long employeeId, Set<Long> skillIds) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Not found"));
+
+        employee.getSkills().removeIf(skill -> skillIds.contains(skill.getId()));
+
+        return employeeRepository.save(employee);
     }
 }
